@@ -103,3 +103,12 @@ export type UserActivity = {
   patient: string;
   status: string;
 };
+
+export type LoggedInUser = {
+  name: string;
+  username: string;
+  role: string;
+  branch: string;
+  initials: string;
+  loginTime: string;
+};

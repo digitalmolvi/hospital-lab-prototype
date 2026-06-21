@@ -4,12 +4,13 @@ import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { currentUser, userActivities } from "../data/mock-data";
-import type { AppView, Patient, UserActivity } from "../types";
+import type { AppView, LoggedInUser, Patient, UserActivity } from "../types";
 import { Card, PageShell, StatusBadge } from "./common";
 
 type DashboardPageProps = {
   patients: Patient[];
   setView: (view: AppView) => void;
+  loggedInUser?: LoggedInUser;
 };
 
 function activityTone(type: UserActivity["type"]) {
@@ -79,7 +80,8 @@ function MiniBar({
   );
 }
 
-export function DashboardPage({ patients, setView }: DashboardPageProps) {
+export function DashboardPage({ patients, setView, loggedInUser }: DashboardPageProps) {
+  const displayUser = loggedInUser ?? currentUser;
   const myActivities = useMemo(() => {
     return userActivities.filter((activity) => activity.userId === currentUser.id);
   }, []);
@@ -106,23 +108,23 @@ export function DashboardPage({ patients, setView }: DashboardPageProps) {
 
   return (
     <PageShell
-      title={`Welcome back, ${currentUser.name}`}
-      subtitle={`${currentUser.role} • ${currentUser.branch} • Today's personal dashboard`}
+      title={`Welcome back, ${displayUser.name}`}
+      subtitle={`${displayUser.role} • ${displayUser.branch} • Today's personal dashboard`}
     >
       <Card className="mb-6 overflow-hidden">
         <div className="flex flex-col gap-5 bg-gradient-to-r from-[#9B55A0] via-[#86408b] to-[#C078C5] p-5 text-white sm:p-7 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-white/15 text-2xl font-black ring-1 ring-white/20">
-              {currentUser.initials}
+              {displayUser.initials}
             </div>
 
             <div>
               <p className="text-sm font-bold text-blue-100">Current Logged-in User</p>
               <h2 className="text-2xl font-black tracking-[-0.05em]">
-                {currentUser.name}
+                {displayUser.name}
               </h2>
               <p className="text-sm font-semibold text-blue-100">
-                {currentUser.role}
+                {displayUser.role}
               </p>
             </div>
           </div>
@@ -174,7 +176,7 @@ export function DashboardPage({ patients, setView }: DashboardPageProps) {
             <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h3 className="text-lg font-black tracking-[-0.03em] text-slate-950">
-                  Today Activity of {currentUser.name}
+                  Today Activity of {displayUser.name}
                 </h3>
                 <p className="text-sm font-medium text-slate-500">
                   Every collection, report delivery, verification, and alert for current login user.
@@ -323,9 +325,9 @@ export function DashboardPage({ patients, setView }: DashboardPageProps) {
 
             {[
               ["Shift", "Morning"],
-              ["Branch", currentUser.branch],
-              ["Login User", currentUser.name],
-              ["Role", currentUser.role],
+              ["Branch", displayUser.branch],
+              ["Login User", displayUser.name],
+              ["Role", displayUser.role],
             ].map(([label, value]) => (
               <div key={label} className="flex justify-between border-b border-slate-100 py-3 text-sm">
                 <span className="font-bold text-slate-500">{label}</span>

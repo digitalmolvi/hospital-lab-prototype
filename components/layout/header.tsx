@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import type { AppView } from "@/features/labcare/types";
+import type { AppView, LoggedInUser } from "@/features/labcare/types";
 import { cn } from "@/lib/utils";
 
 type HeaderProps = {
   view?: AppView;
   setView: (view: AppView) => void;
+  loggedInUser: LoggedInUser;
+  onLogout: () => void;
 };
 
 const navItems: Array<{ label: string; value: AppView }> = [
@@ -18,7 +20,12 @@ const navItems: Array<{ label: string; value: AppView }> = [
   { label: "Lab Entry", value: "labEntry" },
 ];
 
-export function Header({ view = "dashboard", setView }: HeaderProps) {
+export function Header({
+  view = "dashboard",
+  setView,
+  loggedInUser,
+  onLogout,
+}: HeaderProps) {
   const [search, setSearch] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -78,7 +85,7 @@ export function Header({ view = "dashboard", setView }: HeaderProps) {
               event.preventDefault();
               runSearch();
             }}
-            className="flex w-full max-w-[720px] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition focus-within:border-[#9B55A0]/40 focus-within:ring-4 focus-within:ring-[#9B55A0]/20"
+            className="flex w-full max-w-[720px] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition focus-within:border-[#9B55A0] focus-within:ring-4 focus-within:ring-[#9B55A0]/20"
           >
             <span className="text-slate-400">⌕</span>
 
@@ -131,26 +138,34 @@ export function Header({ view = "dashboard", setView }: HeaderProps) {
               className="flex items-center gap-3 rounded-2xl border border-transparent px-2 py-1.5 hover:border-slate-200 hover:bg-slate-50"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-[#9B55A0] to-[#C078C5] text-sm font-black text-white">
-                AJ
+                {loggedInUser.initials}
               </div>
 
               <div className="hidden text-left xl:block">
-                <p className="text-sm font-black text-slate-950">Ahmed Javed</p>
-                <p className="text-xs font-semibold text-slate-500">Lab Collection Officer</p>
+                <p className="text-sm font-black text-slate-950">{loggedInUser.name}</p>
+                <p className="text-xs font-semibold text-slate-500">{loggedInUser.role}</p>
               </div>
 
               <span className="text-slate-500">⌄</span>
             </button>
 
             {showUserMenu ? (
-              <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+              <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                <div className="border-b border-slate-100 px-3 py-3">
+                  <p className="text-sm font-black text-slate-950">{loggedInUser.name}</p>
+                  <p className="text-xs font-semibold text-slate-500">{loggedInUser.branch}</p>
+                  <p className="mt-1 text-[11px] font-semibold text-slate-400">
+                    Login: {loggedInUser.loginTime}
+                  </p>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => {
                     setView("dashboard");
                     setShowUserMenu(false);
                   }}
-                  className="block w-full rounded-xl px-3 py-2 text-left text-sm font-bold text-slate-600 hover:bg-slate-50"
+                  className="mt-2 block w-full rounded-xl px-3 py-2 text-left text-sm font-bold text-slate-600 hover:bg-slate-50"
                 >
                   My Dashboard
                 </button>
@@ -165,10 +180,10 @@ export function Header({ view = "dashboard", setView }: HeaderProps) {
 
                 <button
                   type="button"
-                  onClick={() => setShowUserMenu(false)}
+                  onClick={onLogout}
                   className="block w-full rounded-xl px-3 py-2 text-left text-sm font-bold text-red-600 hover:bg-red-50"
                 >
-                  Sign out
+                  Logout
                 </button>
               </div>
             ) : null}
@@ -192,6 +207,14 @@ export function Header({ view = "dashboard", setView }: HeaderProps) {
             {item.label}
           </button>
         ))}
+
+        <button
+          type="button"
+          onClick={onLogout}
+          className="whitespace-nowrap rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-black text-red-600"
+        >
+          Logout
+        </button>
       </div>
     </header>
   );
